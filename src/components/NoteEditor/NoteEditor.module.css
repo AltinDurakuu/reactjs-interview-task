@@ -1,0 +1,72 @@
+.noteContainer {
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  background-color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+}
+.topButtons {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topButtons div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.topButton {
+  width: 120px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+}
+.topButtons .rightSideButtons .topButton {
+  width: 32px;
+}
+
+.titleInput {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+}
+
+.noteArea {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-top: 1px solid #efefef;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  outline: none;
+  resize: none;
+}
+.titleInput::placeholder,
+.noteArea::placeholder {
+  color: #bfbfbf;
+}
+.bottomButtons {
+  width: 100%;
+  display: flex;
+}
+.saveButton {
+  margin-left: auto;
+  background: #71cf48;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0 16px;
+  line-height: 32px;
+}

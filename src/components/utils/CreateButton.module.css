@@ -1,0 +1,30 @@
+.createButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #71cf48;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+.text {
+  line-height: 32px;
+  border-right: 1px solid #68C142;
+  padding: 0 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 9px;
+  margin-right: 4px;
+}

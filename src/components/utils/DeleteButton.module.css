@@ -1,0 +1,30 @@
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fe4c4a;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.3s;
+}
+
+.text {
+  line-height: 32px;
+  border-right: 1px solid #EB4345;
+  padding: 0 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 9px;
+  margin-right: 4px;
+}

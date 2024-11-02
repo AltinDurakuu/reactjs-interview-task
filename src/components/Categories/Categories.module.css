@@ -1,0 +1,48 @@
+.categoriesContainer{
+    width: 19.5%;
+    min-width: 19.5%;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: scroll;
+}
+.createButton{
+    width: 100%;
+    background: #71CF48;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    height: 32px;
+    border: none;
+    border-radius: 5px;
+    color:  #fff;
+    cursor: pointer;
+}
+.createButton .createButtonText{
+    text-align: center;
+    width: 100%;
+    line-height: 32px;
+    border-right: 1px solid #68C142;
+}
+.createButton span:last-child{
+    margin: 0 9px;
+}
+
+.categoriesContainer::-webkit-scrollbar {
+    overflow-y: auto; 
+    max-height: 96px;
+  }
+  
+.categoriesContainer::-webkit-scrollbar {
+    width: 5px;
+}
+  
+.categoriesContainer::-webkit-scrollbar-track {
+    background: transparent; 
+}
+  
+.categoriesContainer::-webkit-scrollbar-thumb {
+    background-color: #1F2A44;
+    border-radius: 5px; 
+}
+  

@@ -1,0 +1,45 @@
+.categoryButton {
+  background: #1264a3;
+  height: 42px;
+  margin-top: 10px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  border-radius: 5px;
+  padding: 8px 16px;
+}
+
+.categoryButton:hover {
+  background-color: #145a92 !important;
+  color: #fff !important;
+}
+.categoryButton:hover .dropdownIcon,
+.categoryButton:hover .icon {
+  color: #fff;
+}
+
+.iconTextContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  font-size: 18px;
+  color: white;
+}
+
+.dropdownIcon {
+  font-size: 16px;
+  color: white;
+}
+.activeCategory {
+  color: #323338;
+  background: #f8f8fa;
+}
+.activeCategory .dropdownIcon,
+.activeCategory .icon {
+  color: #323338;
+}

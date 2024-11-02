@@ -1,0 +1,38 @@
+.add-title-container {
+  display: flex;
+  align-items: center;
+  background-color: #f5f5f7;
+  padding: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.add-title-input {
+  flex: 1;
+  margin-right: 8px;
+  background: #f5f5f7;
+  border-radius: 5px;
+  border: none;
+}
+
+.add-title-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  margin-right: 5px;
+}
+
+.add-title-button.confirm {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.add-title-button.cancel {
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
