@@ -1,10 +1,18 @@
 import React from "react";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import NoteEditor, { Note } from "./NoteEditor";
 
+// Mock the entire notesapi module
+jest.mock("../utils/notesapi", () => ({
+  createNote: jest.fn(),
+  updateNote: jest.fn(),
+  deleteNote: jest.fn(),
+}));
+
 describe("NoteEditor Component", () => {
-  const mockSetNote = jest.fn();
-  
+  const mockSetActiveNote = jest.fn();
+  const mockFetchNotes = jest.fn();
+
   const noteProps = {
     activeNote: {
       id: 1,
@@ -12,23 +20,32 @@ describe("NoteEditor Component", () => {
       content: "Test Content",
       category_id: 1,
     } as Note,
-    setActiveNote: mockSetNote,
+    setActiveNote: mockSetActiveNote,
+    fetchNotes: mockFetchNotes,
   };
-  
+
   beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("renders correctly with initial props", () => {
     render(<NoteEditor {...noteProps} />);
+    expect(screen.getByPlaceholderText("Add a title")).toHaveValue(
+      noteProps.activeNote.name
+    );
+    expect(screen.getByPlaceholderText("Write your note here...")).toHaveValue(
+      noteProps.activeNote.content
+    );
   });
 
-  test("renders correctly with initial props", () => {
-    expect(screen.getByPlaceholderText("Add a title")).toHaveValue(noteProps.activeNote.name);
-    expect(screen.getByPlaceholderText("Write your note here...")).toHaveValue(noteProps.activeNote.content);
-  });
-
-  test("updates title input on change", () => {
+  it("updates title input on change", () => {
+    render(<NoteEditor {...noteProps} />);
     const titleInput = screen.getByPlaceholderText("Add a title");
-    fireEvent.change(titleInput, { target: { value: "New Title", name: "name" } });
+    fireEvent.change(titleInput, {
+      target: { value: "New Title", name: "name" },
+    });
 
-    expect(mockSetNote).toHaveBeenCalledWith({
+    expect(mockSetActiveNote).toHaveBeenCalledWith({
       id: 1,
       name: "New Title",
       content: "Test Content",
@@ -36,11 +53,16 @@ describe("NoteEditor Component", () => {
     });
   });
 
-  test("updates content textarea on change", () => {
-    const contentTextarea = screen.getByPlaceholderText("Write your note here...");
-    fireEvent.change(contentTextarea, { target: { value: "New Content", name: "content" } });
+  it("updates content textarea on change", () => {
+    render(<NoteEditor {...noteProps} />);
+    const contentTextarea = screen.getByPlaceholderText(
+      "Write your note here..."
+    );
+    fireEvent.change(contentTextarea, {
+      target: { value: "New Content", name: "content" },
+    });
 
-    expect(mockSetNote).toHaveBeenCalledWith({
+    expect(mockSetActiveNote).toHaveBeenCalledWith({
       id: 1,
       name: "Test Title",
       content: "New Content",
@@ -48,14 +70,74 @@ describe("NoteEditor Component", () => {
     });
   });
 
-  test("calls handleSubmit on form submit", () => {
-    const consoleSpy = jest.spyOn(console, "log");
+  it("calls updateNote on form submit for existing note", async () => {
+    const { updateNote } = require("../utils/notesapi");
+    updateNote.mockResolvedValue({
+      ...noteProps.activeNote,
+      name: "Updated Title",
+    });
+
+    render(<NoteEditor {...noteProps} />);
     const form = screen.getByTestId("note-form");
-    
     fireEvent.submit(form);
 
-    expect(consoleSpy).toHaveBeenCalledWith("activeNote saved:", noteProps.activeNote);
-    
-    consoleSpy.mockRestore(); 
+    await waitFor(() => {
+      expect(updateNote).toHaveBeenCalledWith(noteProps.activeNote);
+      expect(mockSetActiveNote).toHaveBeenCalledWith({
+        ...noteProps.activeNote,
+        name: "Updated Title",
+      });
+      expect(mockFetchNotes).toHaveBeenCalled();
+    });
+  });
+
+  it("calls createNote on form submit for new note", async () => {
+    const { createNote } = require("../utils/notesapi");
+    createNote.mockResolvedValue({
+      id: 2,
+      name: "New Note",
+      content: "",
+      category_id: 1,
+    });
+
+    const newNoteProps = {
+      ...noteProps,
+      activeNote: { id: 0, name: "", content: "", category_id: 1 } as Note,
+    };
+
+    render(<NoteEditor {...newNoteProps} />);
+    const form = screen.getByTestId("note-form");
+    fireEvent.submit(form);
+
+    await waitFor(() => {
+      expect(createNote).toHaveBeenCalledWith(newNoteProps.activeNote);
+      expect(mockSetActiveNote).toHaveBeenCalledWith({
+        id: 2,
+        name: "New Note",
+        content: "",
+        category_id: 1,
+      });
+      expect(mockFetchNotes).toHaveBeenCalled();
+    });
+  });
+
+  it("calls deleteNote when delete button is clicked", async () => {
+    const { deleteNote } = require("../utils/notesapi");
+    deleteNote.mockResolvedValue({});
+
+    render(<NoteEditor {...noteProps} />);
+    const deleteButton = screen.getByRole("button", { name: /delete note/i });
+    fireEvent.click(deleteButton);
+
+    await waitFor(() => {
+      expect(deleteNote).toHaveBeenCalledWith(noteProps.activeNote.id);
+      expect(mockSetActiveNote).toHaveBeenCalledWith({
+        id: 0,
+        name: "",
+        category_id: 0,
+        content: "",
+      });
+      expect(mockFetchNotes).toHaveBeenCalled();
+    });
   });
 });

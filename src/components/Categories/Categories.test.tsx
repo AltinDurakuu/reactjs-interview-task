@@ -1,6 +1,12 @@
-import { render, screen, fireEvent } from "@testing-library/react";
-import Categories from "./Categories";
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import  Categories  from "./Categories";
 import AddTitleForm from "./AddCategoryForm";
+import { createCategory } from "../utils/notesapi";
+
+jest.mock("../utils/notesapi", () => ({
+  createCategory: jest.fn(),
+}));
 
 describe("Categories Component", () => {
   const mockCategories = [
@@ -9,6 +15,11 @@ describe("Categories Component", () => {
   ];
   const mockSetActiveCategory = jest.fn();
   const mockSetOpenEditor = jest.fn();
+  const mockFetchCategories = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   it("should render a list of categories", () => {
     render(
@@ -17,6 +28,7 @@ describe("Categories Component", () => {
         activeCategory={null}
         setActiveCategory={mockSetActiveCategory}
         setOpenEditor={mockSetOpenEditor}
+        fetchCategories={mockFetchCategories}
       />
     );
 
@@ -31,6 +43,7 @@ describe("Categories Component", () => {
         setActiveCategory={mockSetActiveCategory}
         activeCategory={null}
         setOpenEditor={mockSetOpenEditor}
+        fetchCategories={mockFetchCategories}
       />
     );
 
@@ -44,29 +57,61 @@ describe("Categories Component", () => {
         activeCategory={null}
         setActiveCategory={mockSetActiveCategory}
         setOpenEditor={mockSetOpenEditor}
+        fetchCategories={mockFetchCategories}
       />
     );
 
     fireEvent.click(screen.getByText("Create Category"));
     expect(screen.getByPlaceholderText("Add a title...")).toBeInTheDocument();
   });
+
+  it("should call createCategory and fetchCategories when a new category is submitted", async () => {
+    (createCategory as jest.Mock).mockResolvedValue({
+      id: 3,
+      name: "New Category",
+    });
+
+    render(
+      <Categories
+        categories={mockCategories}
+        activeCategory={null}
+        setActiveCategory={mockSetActiveCategory}
+        setOpenEditor={mockSetOpenEditor}
+        fetchCategories={mockFetchCategories}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Create Category"));
+    const input = screen.getByPlaceholderText("Add a title...");
+    fireEvent.change(input, { target: { value: "New Category" } });
+    fireEvent.click(screen.getByRole("button", { name: /check/i }));
+
+    await waitFor(() => {
+      expect(createCategory).toHaveBeenCalledWith("New Category");
+      expect(mockFetchCategories).toHaveBeenCalled();
+    });
+  });
 });
-
-
 
 describe("AddCategoryForm Component", () => {
   const mockOnSubmit = jest.fn();
   const mockOnCancel = jest.fn();
 
-  it("should call onSubmit with the title value", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should call onSubmit with the title value", async () => {
     render(<AddTitleForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     const input = screen.getByPlaceholderText("Add a title...");
     fireEvent.change(input, { target: { value: "New Category" } });
-    fireEvent.submit(screen.getByRole("button", { name: /check/i }));
+    fireEvent.click(screen.getByRole("button", { name: /check/i }));
 
-    expect(mockOnSubmit).toHaveBeenCalledWith("New Category");
-    expect(input).toHaveValue("");
+    await waitFor(() => {
+      expect(mockOnSubmit).toHaveBeenCalledWith("New Category");
+      expect(input).toHaveValue("");
+    });
   });
 
   it("should call onCancel when cancel button is clicked", () => {
@@ -76,13 +121,15 @@ describe("AddCategoryForm Component", () => {
     expect(mockOnCancel).toHaveBeenCalled();
   });
 
-  it("should clear the input after submission", () => {
-    render(<AddTitleForm onSubmit={mockOnSubmit} />);
+  it("should clear the input after submission", async () => {
+    render(<AddTitleForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     const input = screen.getByPlaceholderText("Add a title...");
     fireEvent.change(input, { target: { value: "New Category" } });
-    fireEvent.submit(screen.getByRole("button", { name: /check/i }));
+    fireEvent.click(screen.getByRole("button", { name: /check/i }));
 
-    expect(input).toHaveValue("");
+    await waitFor(() => {
+      expect(input).toHaveValue("");
+    });
   });
 });

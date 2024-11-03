@@ -14,7 +14,7 @@ interface CategoryProps {
   setOpenEditor: (openEditor: boolean) => void;
 }
 
-const Category = ({
+const CategoryItem = ({
   name,
   id,
   activeCategory,
@@ -53,4 +53,4 @@ const Category = ({
   );
 };
 
-export default Category;
+export default CategoryItem;

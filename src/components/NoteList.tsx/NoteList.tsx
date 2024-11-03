@@ -3,7 +3,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import styles from "./NoteList.module.css";
 import CreateButton from "../utils/CreateButton";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { getCategories, getNotesByCategory } from "./../utils/notesapi";
 
 interface Note {
   id: number;
@@ -39,32 +39,18 @@ function NoteList({
   );
 
   useEffect(() => {
-    axios
-      .get("/notes.txt")
-      .then((response) => {
-        const data = response.data;
-        const parsedNotes = data.split("\n").map((line: string) => {
-          const [id, name, category_id, content] = line.split(",");
-          return {
-            id: parseInt(id),
-            name,
-            category_id: parseInt(category_id),
-            content,
-          };
-        });
-        const filteredNotes: Note[] = activeCategory
-          ? parsedNotes.filter(
-              (note: { category_id: number }) =>
-                note.category_id === activeCategory
-            )
-          : parsedNotes;
-
-        setNotes(filteredNotes);
-      })
-      .catch((error) => {
-        console.error("Error fetching notes:", error);
-      });
-  }, [activeCategory]);
+    const fetchNotes = async () => {
+      if (activeCategory) {
+        try {
+          const fetchedNotes = await getNotesByCategory(activeCategory);
+          setNotes(fetchedNotes);
+        } catch (error) {
+          console.error("Error fetching notes:", error);
+        }
+      }
+    };
+    fetchNotes();
+  }, [activeCategory, setNotes]);
 
   const handleCreateNote = () => {
     setOpenEditor(true);

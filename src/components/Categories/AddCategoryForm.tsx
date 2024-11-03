@@ -1,7 +1,8 @@
-import { useState, FormEvent } from 'react';
-import { Input, Button } from 'antd';
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import './AddCategoryForm.css';
+import { useState, FormEvent } from "react";
+import { Input, Button } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import "./AddCategoryForm.css";
+import { createCategory } from "../utils/notesapi";
 
 interface AddTitleFormProps {
   onSubmit: (title: string) => void;
@@ -9,18 +10,18 @@ interface AddTitleFormProps {
 }
 
 const AddTitleForm = ({ onSubmit, onCancel }: AddTitleFormProps) => {
-  const [title, setTitle] = useState<string>('');
+  const [title, setTitle] = useState<string>("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
-      onSubmit(title);
-      setTitle('');
+      await onSubmit(title);
+      setTitle("");
     }
   };
 
   const handleCancel = () => {
-    setTitle(''); 
+    setTitle("");
     onCancel && onCancel();
   };
 

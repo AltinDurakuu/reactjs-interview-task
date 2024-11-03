@@ -7,13 +7,14 @@ import Header from "./components/Header/Header";
 import Categories from "./components/Categories/Categories";
 import NoteEditor from "./components/NoteEditor/NoteEditor";
 import NoteList from "./components/NoteList.tsx/NoteList";
+import { getCategories, getNotesByCategory, Category } from "./components/utils/notesapi";
 
 const { Content } = Layout;
 
-interface Category {
-  id: number;
-  name: string;
-}
+// interface Category {
+//   id: number;
+//   name: string;
+// }
 interface Note {
   id: number;
   name: string;
@@ -26,23 +27,58 @@ function App() {
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
   const [openEditor, setOpenEditor] = useState<boolean>(true);
   const [notes, setNotes] = useState<Note[]>([]);
-  const [activeNote, setActiveNote] = useState<Note | null>(null);
+  const [activeNote, setActiveNote] = useState<Note | null>({id:0, name:"", content:"", category_id:0 });
+
+  const fetchCategories = async () => {
+    console.log("Fetching categories");
+    try {
+      const fetchedCategories = await getCategories();
+      setCategories(fetchedCategories);
+ 
+      console.log(fetchedCategories); 
+      console.log("Categories fetched successfully");
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   useEffect(() => {
-    axios
-      .get("/categories.txt")
-      .then((response) => {
-        const data = response.data;
-        const parsedCategories = data.split("\n").map((line: string) => {
-          const [id, name] = line.split(",");
-          return { id: parseInt(id), name };
-        });
-        setCategories(parsedCategories);
-      })
-      .catch((error) => {
+    const fetchCategories = async () => {
+      console.log("Fetching categories");
+      try {
+        const fetchedCategories = await getCategories();
+        setCategories(fetchedCategories);
+        setActiveNote((prevNote) => ({
+          id: prevNote?.id || 0,
+          name: prevNote?.name || "",
+          content: prevNote?.content || "",
+          category_id: fetchedCategories[0]?.id || 0
+        }));
+        console.log(fetchedCategories); 
+        console.log("Categories fetched successfully");
+      } catch (error) {
         console.error("Error fetching categories:", error);
-      });
+      }
+    };
+
+    fetchCategories();
+    
   }, []);
+
+  const fetchNotes = async () => {
+    if (activeCategory) {
+      try {
+        const fetchedNotes = await getNotesByCategory(activeCategory);
+        setNotes(fetchedNotes);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, [activeCategory]);
 
   return (
     <Layout className="App">
@@ -53,6 +89,7 @@ function App() {
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
           setOpenEditor={setOpenEditor}
+          fetchCategories={fetchCategories}
         />
         {activeCategory && (
           <NoteList
@@ -69,6 +106,7 @@ function App() {
             setActiveNote={(note: Note | null) => {
               setActiveNote(note);
             }}
+            fetchNotes={fetchNotes}
           />
         )}
       </Content>

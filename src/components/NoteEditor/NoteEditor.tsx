@@ -2,10 +2,12 @@ import { FormEvent } from "react";
 import styles from "./NoteEditor.module.css";
 import { Button } from "antd";
 import DeleteButton from "./../utils/DeleteButton";
+import { createNote, deleteNote, updateNote } from "./../utils/notesapi";
 
 interface NoteEditorProps {
   activeNote: Note | null;
   setActiveNote: (note: Note) => void;
+  fetchNotes: () => void;
 }
 
 export interface Note {
@@ -15,16 +17,40 @@ export interface Note {
   content: string;
 }
 
-function NoteEditor({ activeNote, setActiveNote}: NoteEditorProps) {
+function NoteEditor({ activeNote, setActiveNote, fetchNotes}: NoteEditorProps) {
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    //if id is 0 add a new note, if not update the notea
-    console.log("activeNote saved:", activeNote);
+    if (activeNote) {
+      try {
+        if (activeNote.id === 0) {
+          const newNote = await createNote(activeNote);
+          setActiveNote({ ...newNote });
+        } else {
+          const updatedNote = await updateNote(activeNote);
+          setActiveNote({ ...updatedNote });
+        }
+        console.log("Note saved successfully");
+      } catch (error) {
+        console.error("Error saving note:", error);
+      } finally {
+        fetchNotes()
+      }
+    }
   };
 
-  const handleDelete = () => {
-    console.log("Note deleted:", activeNote?.id);
+  const handleDelete = async () => {
+    if (activeNote && activeNote.id !== 0) {
+      try {
+        await deleteNote(activeNote.id);
+        setActiveNote({id: 0, name: "", category_id: 0, content: ""});
+        console.log("Note deleted successfully");
+      } catch (error) {
+        console.error("Error deleting note:", error);
+      } finally {
+        fetchNotes()
+      }
+    }
   };
 
   const handleChange = (
@@ -34,7 +60,7 @@ function NoteEditor({ activeNote, setActiveNote}: NoteEditorProps) {
     if (activeNote) {
       setActiveNote({
         ...activeNote,
-        [name]: name === "id" ? Number(value) : value,
+      [name]: name === "id" ? Number(value) : value,
       });
     }
   };
@@ -93,7 +119,7 @@ function NoteEditor({ activeNote, setActiveNote}: NoteEditorProps) {
       ></textarea>
 
       <div className={styles.bottomButtons}>
-        {activeNote?.id !== undefined && <DeleteButton onClick={handleDelete} />}
+        {activeNote?.id !== 0 && <DeleteButton onClick={handleDelete} />}
         <Button className={styles.saveButton} type="primary" htmlType="submit">
           Save Changes
         </Button>
