@@ -1,8 +1,8 @@
-import { Button, Input } from "antd";
-import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import { Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import styles from "./NoteList.module.css";
 import CreateButton from "../utils/CreateButton";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 interface Note {
@@ -27,6 +27,16 @@ function NoteList({
   setNotes,
   setActiveNote,
 }: NoteListProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const filteredNotes = notes.filter(
+    (note) =>
+      note.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   useEffect(() => {
     axios
@@ -64,21 +74,26 @@ function NoteList({
       category_id: activeCategory || 0,
       content: "",
     });
-  }
+  };
 
   return (
     <div className={styles.noteListContainer}>
       <div className={styles.noteListHeader}>
-        <CreateButton  onClick={handleCreateNote} width={"218px"} text="Create Note" />
+        <CreateButton
+          onClick={handleCreateNote}
+          width={"218px"}
+          text="Create Note"
+        />
         <Input
           placeholder="Search..."
           prefix={<SearchOutlined />}
           className={styles.searchInput}
+          onChange={handleInputChange}
         />
       </div>
 
       <div className={styles.notesList}>
-        {notes.map((note) => (
+        {filteredNotes.map((note) => (
           <div
             onClick={() => {
               setActiveNote(note);

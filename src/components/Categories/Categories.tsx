@@ -1,7 +1,7 @@
 import Category from "./Category";
 import styles from "./Categories.module.css";
 import CreateButton from "../utils/CreateButton";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddTitleForm from "./AddCategoryForm";
 
 interface CategoriesProps {
