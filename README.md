@@ -1,5 +1,11 @@
+npm install
 to start the app - npm start
 to run the tests - npm test
+
+create a postgres database with the name noteapp
+update on the env file your database user and database password
+run createtables.js
+run server
 
 How might you make this app more secure?
 the app could be more secure if we add authentication and authorization, regularly update dependencies and libraries,
